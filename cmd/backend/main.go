@@ -6,6 +6,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"log/slog"
 	"net/http"
 	"os"
@@ -15,6 +16,7 @@ import (
 
 	"github.com/FranAndrews/GateWayr/internal/handler"
 	"github.com/FranAndrews/GateWayr/internal/store"
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 func main() {
@@ -32,12 +34,45 @@ func main() {
 	addr := ":" + port
 
 	// ── Initialise store ────────────────────────────────────────────────
-	memStore := store.NewMemoryStore()
+	var appStore store.Store
+	var db *sql.DB
+
+	if dbURL := os.Getenv("DATABASE_URL"); dbURL != "" {
+		var err error
+		db, err = sql.Open("pgx", dbURL)
+		if err != nil {
+			logger.Error("failed to open database connection", slog.String("error", err.Error()))
+			os.Exit(1)
+		}
+		db.SetMaxOpenConns(25)
+		db.SetMaxIdleConns(5)
+		db.SetConnMaxLifetime(5 * time.Minute)
+
+		ctxInit, cancelInit := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancelInit()
+
+		if err := db.PingContext(ctxInit); err != nil {
+			logger.Error("failed to connect to database", slog.String("error", err.Error()))
+			os.Exit(1)
+		}
+
+		pgStore := store.NewPostgresStore(db)
+		if err := pgStore.InitSchema(ctxInit); err != nil {
+			logger.Error("failed to initialize schema", slog.String("error", err.Error()))
+			os.Exit(1)
+		}
+
+		logger.Info("connected to PostgreSQL database", slog.String("instance", instanceName))
+		appStore = pgStore
+	} else {
+		logger.Info("using in-memory store (DATABASE_URL not set)", slog.String("instance", instanceName))
+		appStore = store.NewMemoryStore()
+	}
 
 	// ── Register routes ─────────────────────────────────────────────────
 	mux := http.NewServeMux()
 
-	appHandler := handler.NewApplicationHandler(memStore)
+	appHandler := handler.NewApplicationHandler(appStore)
 	appHandler.RegisterRoutes(mux)
 
 	mux.HandleFunc("GET /health", handler.HealthHandler())
@@ -73,6 +108,12 @@ func main() {
 
 	if err := srv.Shutdown(ctx); err != nil {
 		logger.Error("shutdown error", slog.String("error", err.Error()))
+	}
+
+	if db != nil {
+		if err := db.Close(); err != nil {
+			logger.Error("database close error", slog.String("error", err.Error()))
+		}
 	}
 
 	logger.Info("backend stopped", slog.String("instance", instanceName))
