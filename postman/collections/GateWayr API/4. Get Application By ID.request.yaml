@@ -1,0 +1,11 @@
+$kind: http-request
+description: Retrieves an application by ID.
+url: "{{baseUrl}}/api/v1/applications/:id"
+method: GET
+headers:
+  X-API-Key: "{{apiKey}}"
+pathVariables:
+  - key: id
+    value: REPLACE_WITH_APPLICATION_ID
+    description: UUID returned when the application was created
+order: 4042

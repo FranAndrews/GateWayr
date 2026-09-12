@@ -1,0 +1,5 @@
+$kind: collection
+description: API Gateway and Microservices Architecture testing collection for GateWayr.
+variables:
+  baseUrl: http://localhost:8080
+  apiKey: gw-dev-key-001

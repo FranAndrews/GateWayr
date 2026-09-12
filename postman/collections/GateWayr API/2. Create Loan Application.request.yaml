@@ -1,0 +1,17 @@
+$kind: http-request
+description: Creates a new loan application. Returns 201 Created with generated
+  UUID and timestamp.
+url: "{{baseUrl}}/api/v1/applications"
+method: POST
+headers:
+  X-API-Key: "{{apiKey}}"
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "applicant_name": "Alice Smith",
+      "email": "alice.smith@example.com",
+      "income_amount": 85000
+    }
+order: 3000

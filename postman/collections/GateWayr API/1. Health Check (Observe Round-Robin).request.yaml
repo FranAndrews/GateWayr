@@ -1,0 +1,8 @@
+$kind: http-request
+description: |-
+  Public health check endpoint. Does NOT require an API key.
+
+  Click 'Send' multiple times to see the 'instance' value cycle between backend-1, backend-2, and backend-3.
+url: "{{baseUrl}}/health"
+method: GET
+order: 2000

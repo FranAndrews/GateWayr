@@ -1,0 +1,36 @@
+## GateWayr — API Gateway Configuration
+
+server:
+  port: 8080
+  read_timeout: 10s
+  write_timeout: 15s
+  idle_timeout: 60s
+
+# Backend instances that the load balancer will distribute traffic across.
+# In Docker Compose, these resolve via internal DNS names.
+backends:
+  - url: "http://backend-1:9000"
+  - url: "http://backend-2:9000"
+  - url: "http://backend-3:9000"
+
+middleware:
+  # API key authentication
+  auth:
+    enabled: true
+    # Keys that are accepted. In production these would come from a secrets manager.
+    api_keys:
+      - "gw-dev-key-001"
+      - "gw-dev-key-002"
+    # Paths that bypass API key validation.
+    skip_paths:
+      - "/health"
+
+  # Token-bucket rate limiter (per client IP)
+  rate_limit:
+    enabled: true
+    requests_per_second: 10
+    burst: 20
+
+  # Structured request/response logging
+  logging:
+    enabled: true

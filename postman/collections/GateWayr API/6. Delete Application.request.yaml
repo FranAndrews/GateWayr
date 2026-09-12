@@ -1,0 +1,9 @@
+$kind: http-request
+description: Deletes an application by ID. Returns 204 No Content.
+url: "{{baseUrl}}/api/v1/applications/:id"
+method: DELETE
+headers:
+  X-API-Key: "{{apiKey}}"
+pathVariables:
+  id: REPLACE_WITH_APPLICATION_ID
+order: 6000

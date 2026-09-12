@@ -1,0 +1,8 @@
+$kind: http-request
+description: Lists applications currently stored on the backend instance that
+  handles this request.
+url: "{{baseUrl}}/api/v1/applications"
+method: GET
+headers:
+  X-API-Key: "{{apiKey}}"
+order: 4000

@@ -1,0 +1,13 @@
+# Use this workspace to collaborate
+workspace:
+  id: 1f269910-f7f7-4958-84e6-ef9f4aed6e79
+
+cloudResources:
+  collections:
+    ../postman/collections/GateWayr API: 89857b73-f9ef-4c50-a5b5-8c7d031cf872
+
+# All resources in the `postman/` folder are automatically registered in Local View.
+# Point to additional files outside the `postman/` folder to register them individually. Example:
+#localResources:
+#  collections:
+#    - ../tests/E2E Test Collection/
