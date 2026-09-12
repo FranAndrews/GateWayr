@@ -1,0 +1,17 @@
+$kind: http-request
+description: Updates fields of an application.
+url: "{{baseUrl}}/api/v1/applications/:id"
+method: PUT
+headers:
+  X-API-Key: "{{apiKey}}"
+  Content-Type: application/json
+pathVariables:
+  id: REPLACE_WITH_APPLICATION_ID
+body:
+  type: json
+  content: |-
+    {
+      "status": "approved",
+      "income_amount": 92000
+    }
+order: 5000

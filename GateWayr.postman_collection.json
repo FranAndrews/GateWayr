@@ -1,0 +1,240 @@
+{
+	"info": {
+		"_postman_id": "gatewayr-api-collection",
+		"name": "GateWayr API",
+		"description": "API Gateway and Microservices Architecture testing collection for GateWayr.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "apiKey",
+			"value": "gw-dev-key-001",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Health Check (Observe Round-Robin)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/health",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"health"
+					]
+				},
+				"description": "Public health check endpoint. Does NOT require an API key.\n\nClick 'Send' multiple times to see the 'instance' value cycle between backend-1, backend-2, and backend-3."
+			},
+			"response": []
+		},
+		{
+			"name": "2. Create Loan Application",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-API-Key",
+						"value": "{{apiKey}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"applicant_name\": \"Alice Smith\",\n  \"email\": \"alice.smith@example.com\",\n  \"income_amount\": 85000\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/applications",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"applications"
+					]
+				},
+				"description": "Creates a new loan application. Returns 201 Created with generated UUID and timestamp."
+			},
+			"response": []
+		},
+		{
+			"name": "3. List All Applications",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-API-Key",
+						"value": "{{apiKey}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/applications",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"applications"
+					]
+				},
+				"description": "Lists applications currently stored on the backend instance that handles this request."
+			},
+			"response": []
+		},
+		{
+			"name": "4. Get Application By ID",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-API-Key",
+						"value": "{{apiKey}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/applications/:id",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"applications",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "REPLACE_WITH_APPLICATION_ID",
+							"description": "UUID returned when the application was created"
+						}
+					]
+				},
+				"description": "Retrieves an application by ID."
+			},
+			"response": []
+		},
+		{
+			"name": "5. Update Application",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "X-API-Key",
+						"value": "{{apiKey}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"status\": \"approved\",\n  \"income_amount\": 92000\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/applications/:id",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"applications",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "REPLACE_WITH_APPLICATION_ID"
+						}
+					]
+				},
+				"description": "Updates fields of an application."
+			},
+			"response": []
+		},
+		{
+			"name": "6. Delete Application",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "X-API-Key",
+						"value": "{{apiKey}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/applications/:id",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"applications",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "REPLACE_WITH_APPLICATION_ID"
+						}
+					]
+				},
+				"description": "Deletes an application by ID. Returns 204 No Content."
+			},
+			"response": []
+		},
+		{
+			"name": "7. Test Unauthorized (Missing Key)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/applications",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"applications"
+					]
+				},
+				"description": "Tests the gateway API key middleware. Expected response: 401 Unauthorized."
+			},
+			"response": []
+		}
+	]
+}

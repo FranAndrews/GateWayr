@@ -1,0 +1,5 @@
+$kind: http-request
+description: "Tests the gateway API key middleware. Expected response: 401 Unauthorized."
+url: "{{baseUrl}}/api/v1/applications"
+method: GET
+order: 7000
