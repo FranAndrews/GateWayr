@@ -1,0 +1,103 @@
+# GateWayr — Docker Compose
+#
+# Spins up the full distributed system locally:
+#   - 1 API Gateway (reverse proxy + load balancer) on port 8080
+#   - 3 Backend CRUD API instances on internal port 9000
+#   - 1 PostgreSQL instance (Google Cloud SQL compatible) on port 5432
+#   - 1 pgAdmin 4 instance (SSMS web studio equivalent) on port 5050
+#
+# Usage:
+#   docker compose up --build
+#   curl http://localhost:8080/health        # Observe round-robin cycling
+#   Open http://localhost:5050 in browser   # Open Database Studio (pgAdmin)
+
+services:
+  gateway:
+    build:
+      context: .
+      dockerfile: docker/gateway.Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend-1
+      - backend-2
+      - backend-3
+    restart: unless-stopped
+    environment:
+      CONFIG_PATH: "/app/config.yaml"
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: gatewayr
+      POSTGRES_PASSWORD: gatewayr_secret
+      POSTGRES_DB: gatewayr_db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gatewayr -d gatewayr_db"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    restart: unless-stopped
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@gatewayr.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+    volumes:
+      - ./docker/pgadmin/servers.json:/pgadmin4/servers.json:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  backend-1:
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    environment:
+      PORT: "9000"
+      INSTANCE_NAME: "backend-1"
+      DATABASE_URL: "postgres://gatewayr:gatewayr_secret@postgres:5432/gatewayr_db?sslmode=disable"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  backend-2:
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    environment:
+      PORT: "9000"
+      INSTANCE_NAME: "backend-2"
+      DATABASE_URL: "postgres://gatewayr:gatewayr_secret@postgres:5432/gatewayr_db?sslmode=disable"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  backend-3:
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    environment:
+      PORT: "9000"
+      INSTANCE_NAME: "backend-3"
+      DATABASE_URL: "postgres://gatewayr:gatewayr_secret@postgres:5432/gatewayr_db?sslmode=disable"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  pgdata:
