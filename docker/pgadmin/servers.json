@@ -1,0 +1,13 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "GateWayr DB (Cloud SQL)",
+      "Group": "Servers",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "gatewayr_db",
+      "Username": "gatewayr",
+      "SSLMode": "prefer"
+    }
+  }
+}

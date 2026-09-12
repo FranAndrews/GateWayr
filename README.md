@@ -1,5 +1,7 @@
 # GateWayr
 
+<<<<<<< Updated upstream
+=======
 A custom-built distributed microservices architecture featuring an API Gateway (Reverse Proxy), round-robin load balancer, internal CRUD APIs, and a middleware stack — all containerised with Docker.
 
 > **Learning project** — built to develop hands-on understanding of network architecture, cloud infrastructure (GCP), containerisation, and enterprise-grade backend patterns.
@@ -46,7 +48,8 @@ A custom-built distributed microservices architecture featuring an API Gateway (
 | Load Balancer | Go (custom round-robin with `sync/atomic`) |
 | Middleware | Go (`log/slog`, `golang.org/x/time/rate`) |
 | CRUD APIs | Go 1.22+ enhanced `ServeMux` |
-| Data Store | In-memory (Phase 1) → Firestore (Phase 2) |
+| Database | PostgreSQL 16 (Google Cloud SQL compatible) via `pgx/v5` |
+| Database Studio | pgAdmin 4 (`http://localhost:5050`) |
 | Containerisation | Docker, Docker Compose |
 
 ## Quick Start
@@ -177,3 +180,4 @@ go test ./internal/... -v
 ## License
 
 This project is licensed under the GNU General Public License v3.0 — see [LICENSE](LICENSE) for details.
+>>>>>>> Stashed changes
